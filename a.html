@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Complete Car Dealership — Website + AI/ML Flow</title>
+<style>
+  body { margin:0; padding:0; font-family: -apple-system, "Segoe UI", Arial, sans-serif; background:#fafaf8; }
+  #toolbar { position:sticky; top:0; z-index:10; display:flex; gap:8px; align-items:center; padding:10px 16px; background:#ffffff; border-bottom:1px solid #e5e3da; flex-wrap:wrap; row-gap:6px; }
+  #toolbar button { border:1px solid #d3d1c7; background:#fff; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:13px; }
+  #toolbar button:hover { background:#f1efe8; }
+  #toolbar span { font-size:13px; color:#5f5e5a; }
+  #toolbar .legend { display:flex; flex-wrap:wrap; gap:6px 10px; margin-left:auto; align-items:center; }
+  #toolbar .legend .item { display:flex; align-items:center; gap:3px; font-size:10px; color:#5f5e5a; }
+  #toolbar .legend .chip { width:10px; height:10px; border-radius:2px; display:inline-block; }
+  #canvas-wrap { width:100%; height:calc(100vh - 65px); overflow:auto; cursor:grab; }
+  #canvas-wrap:active { cursor:grabbing; }
+  #stage { transform-origin: 0 0; padding:30px; display:inline-block; }
+  .mermaid { background:transparent; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <button onclick="zoom(1.15)">🔍 Zoom in</button>
+  <button onclick="zoom(0.87)">🔍 Zoom out</button>
+  <button onclick="resetZoom()">⟲ Reset</button>
+  <span>Scroll to pan &middot; drag to pan &middot; use buttons to zoom</span>
+  <div class="legend">
+    <span class="item"><span class="chip" style="background:#1f2430;"></span>Start</span>
+    <span class="item"><span class="chip" style="background:#dceeff;border:1px solid #7fb3e8;"></span>Auth</span>
+    <span class="item"><span class="chip" style="background:#fff6cf;border:1px solid #e8c94a;"></span>Decision</span>
+    <span class="item"><span class="chip" style="background:#d7f5e8;border:1px solid #7fdcb0;"></span>Customer</span>
+    <span class="item"><span class="chip" style="background:#fde3c7;border:1px solid #f0b26a;"></span>Car Details</span>
+    <span class="item"><span class="chip" style="background:#e6e0fb;border:1px solid #b0a3ee;"></span>AI</span>
+    <span class="item"><span class="chip" style="background:#fbdcec;border:1px solid #ec9dc0;"></span>Booking</span>
+    <span class="item"><span class="chip" style="background:#fff2c7;border:1px solid #e8c94a;"></span>Purchase</span>
+    <span class="item"><span class="chip" style="background:#d3ecff;border:1px solid #82bdf0;"></span>Dashboard</span>
+    <span class="item"><span class="chip" style="background:#fcdede;border:1px solid #e69a9a;"></span>Admin</span>
+    <span class="item"><span class="chip" style="background:#cdeff0;border:1px solid #7fd0d4;"></span>Dealer</span>
+    <span class="item"><span class="chip" style="background:#DBEAFE;border:1px solid #3B82F6;"></span>Data</span>
+    <span class="item"><span class="chip" style="background:#FEF08A;border:1px solid #EAB308;"></span>Preprocess</span>
+    <span class="item"><span class="chip" style="background:#EDE0FF;border:2px solid #9F7AEA;"></span>ML Training</span>
+    <span class="item"><span class="chip" style="background:#BBF7D0;border:1px solid #22C55E;"></span>Deploy</span>
+    <span class="item"><span class="chip" style="background:#FECACA;border:1px solid #EF4444;"></span>Monitor</span>
+  </div>
+</div>
+
+<div id="canvas-wrap">
+  <div id="stage">
+    <pre class="mermaid">
+%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 28, "rankSpacing": 50}, "theme": "base", "themeVariables": {"fontSize":"12px"}}}%%
+flowchart LR
+
+%% ==================== USER FLOW ====================
+
+subgraph Auth[🔐 Authentication]
+  Start([Start]) --> Splash[Splash Screen] --> Welcome[Welcome Page] --> NewExisting{New or existing user?}
+  NewExisting -->|Existing| Login[Login]
+  NewExisting -->|New| Register[Register]
+  Login -->|Forgot password| ForgotPwd[Forgot Password] --> OTP[OTP Verification] --> ResetPwd[Reset Password]
+  Login -->|Success| SelectRole{Select role}
+  Register -->|Verified| SelectRole
+end
+
+SelectRole -->|Customer| HomePage[🏠 Home Page]
+SelectRole -->|Dealer| DealerDash[📊 Dealer Dashboard]
+SelectRole -->|Admin| AdminDash[⚙️ Admin Dashboard]
+
+%% ==================== ADMIN ====================
+subgraph Admin[🛠️ Admin Portal]
+  AdminDash --> UserMgmt[User Management]
+  AdminDash --> DealerMgmt[Dealer Management]
+  AdminDash --> CarMgmt[Car Management]
+  CarMgmt --> Inventory[Inventory]
+  CarMgmt --> Categories[Categories]
+  CarMgmt --> Brands[Brands]
+  AdminDash --> PaymentMgmt[Payment Management]
+  AdminDash --> Finance[Finance / Analytics]
+  AdminDash --> Reports[Reports]
+  AdminDash --> SysSettings[System Settings]
+  AdminDash --> ReviewsMgmt[Reviews Management]
+  AdminDash --> BookingsMgmt[Bookings Management]
+end
+
+%% ==================== DEALER ====================
+subgraph Dealer[🏪 Dealer Portal]
+  DealerDash --> SalesDash[Sales Dashboard]
+  DealerDash --> CustReq[Customer Requests]
+  DealerDash --> TestDriveReq[Test Drive Requests]
+  DealerDash --> DealerAnalytics[Dealer Analytics]
+  DealerDash --> AddCar[Add New Car]
+  DealerDash --> EditCar[Edit Car]
+  DealerDash --> DeleteCar[Delete Car]
+  AddCar & EditCar --> InvMgmt[Inventory Management]
+end
+
+%% ==================== CUSTOMER ====================
+subgraph Customer[👤 Customer Experience]
+  HomePage --> SearchCars[🔍 Search Cars]
+  HomePage --> AdvSearch[Advanced Search]
+  HomePage --> TrendingCars[Trending Cars]
+  HomePage --> BestDeals[Best Deals]
+  HomePage --> AIChat[🤖 AI Chat Assistant]
+  HomePage --> HelpCenter[Help Center]
+  HomePage --> AboutUs[About Us]
+  HomePage --> CarCategories[Car Categories]
+  HomePage --> FeaturedCars[Featured Cars]
+  HomePage --> AskQuestions[Ask Questions]
+end
+
+%% ==================== AI CHAT ====================
+subgraph AI[🧠 AI Features]
+  AIChat --> AIChatbot[AI Chatbot]
+  AIChatbot --> CompareAI[Compare by AI]
+  AIChatbot --> VoiceSearch[Voice Search]
+  AIChatbot --> AICarRec[AI Car Recommendation]
+  AICarRec --> FamilyRec[Family Car Rec]
+  AICarRec --> FuelRec[Fuel Efficiency Rec]
+  AICarRec --> EVRec[EV Recommendation]
+  AICarRec --> BudgetRec[Budget Recommendation]
+end
+
+%% ==================== HELP ====================
+subgraph Help[💬 Support]
+  HelpCenter --> ContactUs[Contact Us]
+  HelpCenter --> LiveChat[Live Chat]
+  HelpCenter --> FAQ[FAQ]
+  HelpCenter --> ReportIssue[Report Issue]
+  AboutUs --> Terms[Terms & Conditions]
+  AboutUs --> OurTeam[Our Team]
+  AboutUs --> Careers[Careers]
+  AboutUs --> NewsBlogs[News & Blogs] --> PressReleases[Press Releases]
+  AboutUs --> PrivacyPolicy[Privacy Policy]
+  AskQuestions --> DiscussionForum[Discussion Forum]
+end
+
+%% ==================== CAR CATEGORIES ====================
+subgraph Categories[🚗 Browse Cars]
+  CarCategories --> NewCars[New Cars]
+  CarCategories --> UsedCars[Used Cars]
+  CarCategories --> ElectricCars[Electric Vehicles]
+  CarCategories --> LuxuryCars[Luxury Cars]
+  CarCategories --> UpcomingCars[Upcoming Cars]
+  CarCategories --> BrandCollection[Brand Collection]
+end
+
+%% ==================== CAR DETAILS ====================
+subgraph CarDetail[📄 Car Details]
+  SearchCars & AdvSearch & TrendingCars & BestDeals & NewCars & UsedCars & ElectricCars & LuxuryCars & UpcomingCars & BrandCollection & FeaturedCars & AICarRec & CompareAI & VoiceSearch --> CarDetails[🚗 Car Details]
+  CarDetails --> ImageGallery[Image Gallery]
+  CarDetails --> VideoGallery[Video Gallery]
+  CarDetails --> View360[360° Car View]
+  CarDetails --> Specs[Specifications]
+  CarDetails --> Features[Features & Accessories]
+  CarDetails --> Safety[Safety Features]
+  CarDetails --> CompareCars[Compare Cars]
+  CarDetails --> SimilarCars[Similar Cars]
+  CarDetails --> AIRecCars[AI Recommended Cars]
+  CarDetails --> PriceHistory[Price History]
+  CarDetails --> EMICalc[EMI Calculator]
+  CarDetails --> InsuranceEst[Insurance Estimator]
+  CarDetails --> AddWishlist[Add to Wishlist]
+  CarDetails --> AddCompare[Add to Compare]
+  CarDetails --> Cart[🛒 Cart]
+  CarDetails --> BookTestDrive[📅 Book Test Drive]
+  CarDetails --> AskQ2[Ask a Question] --> InquiryStored[Inquiry Stored]
+end
+
+%% ==================== PURCHASE ====================
+subgraph Purchase[💳 Checkout]
+  Cart --> Checkout[Checkout] --> Payment[Payment] --> PaymentSuccess{Payment successful?}
+  PaymentSuccess -->|Yes| PaySuccess[Payment Success] --> Invoice[Invoice] --> Dashboard[📊 Dashboard]
+  PaymentSuccess -->|No| RetryPayment[Retry Payment] --> Payment
+end
+
+%% ==================== BOOKING ====================
+subgraph Booking[📅 Test Drive]
+  BookTestDrive --> SelectDealer[Select Dealer] --> Schedule[Schedule Appointment] --> BookingConf[Booking Confirmation] --> BookingHistory[Booking History]
+  BookingHistory --> NeedCancel{Need to cancel?}
+  NeedCancel -->|Yes| CancelBooking[Cancel Booking] --> Dashboard
+  NeedCancel -->|No| Dashboard
+end
+
+%% ==================== DASHBOARD ====================
+subgraph Dashboard[📊 User Dashboard]
+  Dashboard --> MyProfile[My Profile] --> EditProfile[Edit Profile]
+  Dashboard --> SavedCars[Saved Cars]
+  Dashboard --> Wishlist[Wishlist]
+  Dashboard --> ComparedCars[Compared Cars]
+  Dashboard --> OrderHistory[Order History]
+  Dashboard --> Notifications[Notifications]
+  Dashboard --> ChatHistory[Chat History]
+  Dashboard --> MyReviews[My Reviews]
+  Dashboard --> CustomerReviews[Customer Reviews]
+  Dashboard --> SettingsNode[Settings]
+  Dashboard --> AIDash[🧠 AI Dashboard]
+end
+
+%% ==================== AI DASHBOARD ====================
+subgraph AIDash[🤖 AI Insights]
+  AIDash --> NearbyShowrooms[Nearby Showrooms]
+  AIDash --> ServiceCenters[Nearby Service Centers]
+  AIDash --> RoadsideAssist[Roadside Assistance]
+  AIDash --> MarketTrends[AI Market Trends]
+  AIDash --> PricePrediction[Price Prediction]
+  AIDash --> PersonalizedRec[Personalized Recommendations]
+  AIDash --> ResaleValue[Resale Value Prediction]
+  AIDash --> FuelCostPred[Fuel Cost Prediction]
+  AIDash --> LoanEligibility[Loan Eligibility Prediction]
+  AIDash --> MaintenanceCost[Maintenance Cost Prediction]
+  AIDash --> SuccessStories[Success Stories]
+  AIDash --> VoiceAssistant[Voice Assistant]
+  AIDash --> Ratings[Ratings]
+end
+
+%% ==================== ML PIPELINE ====================
+subgraph ML[🧠 ML Classification Pipeline]
+  direction LR
+  ML1[Data Sources<br>MongoDB / CSV / Logs]:::datasource
+  ML2[Preprocessing<br>Cleaning / Encoding / Scaling]:::preprocess
+  ML3[📓 Jupyter Notebook<br>Model Training & Tuning]:::train
+  ML4[Evaluation<br>Metrics / Confusion Matrix]:::eval
+  ML5[Deploy<br>FastAPI / Batch / Edge]:::deploy
+  ML6[Monitoring<br>Drift / Alerts]:::monitor
+  ML7[Retraining<br>Feedback / Schedule]:::retrain
+
+  ML1 --> ML2 --> ML3 --> ML4 --> ML5 --> ML6 --> ML7
+  ML7 --> ML3
+end
+
+%% ==================== DATA FLOW ====================
+MongoDB[(MongoDB)]:::datasource --> ML1
+MongoDB --> AIChatbot
+MongoDB --> AIFeatures
+ReviewsDB[(Reviews)]:::datasource --> ML1
+UserLogs[(User Logs)]:::datasource --> ML1
+CSV[(CSV Imports)]:::datasource --> ML1
+
+ML5 --> APIs[APIs]:::deploy
+APIs --> AIChatbot
+APIs --> PricePrediction
+APIs --> AIDash
+
+%% ==================== STYLES ====================
+classDef startEnd fill:#1f2430,stroke:#1f2430,color:#ffffff
+classDef auth fill:#dceeff,stroke:#7fb3e8,color:#0c447c
+classDef decision fill:#fff6cf,stroke:#e8c94a,color:#6b5a06
+classDef admin fill:#fcdede,stroke:#e69a9a,color:#791f1f
+classDef dealer fill:#cdeff0,stroke:#7fd0d4,color:#085041
+classDef home fill:#d7f5e8,stroke:#7fdcb0,color:#04342c
+classDef ai fill:#e6e0fb,stroke:#b0a3ee,color:#3c3489
+classDef help fill:#eef0d6,stroke:#c7cf8e,color:#3b6d11
+classDef about fill:#eeeeee,stroke:#bbbbbb,color:#2c2c2a
+classDef categories fill:#cdeff0,stroke:#7fd0d4,color:#085041
+classDef cardetail fill:#fde3c7,stroke:#f0b26a,color:#633806
+classDef checkout fill:#fff2c7,stroke:#e8c94a,color:#6b5a06
+classDef booking fill:#fbdcec,stroke:#ec9dc0,color:#72243e
+classDef dashboard fill:#d3ecff,stroke:#82bdf0,color:#0c447c
+classDef aidash fill:#f6d9ea,stroke:#e79cc4,color:#72243e
+classDef datasource fill:#DBEAFE,stroke:#3B82F6,color:#1E3A8A
+classDef preprocess fill:#FEF08A,stroke:#EAB308,color:#854D0E
+classDef train fill:#EDE0FF,stroke:#9F7AEA,color:#3B2166
+classDef eval fill:#A5F3FC,stroke:#06B6D4,color:#164E63
+classDef deploy fill:#BBF7D0,stroke:#22C55E,color:#14532D
+classDef monitor fill:#FECACA,stroke:#EF4444,color:#7F1D1D
+classDef retrain fill:#F5D0FE,stroke:#D946EF,color:#701A75
+
+class Start startEnd
+class Splash,Welcome,Login,Register,ForgotPwd,OTP,ResetPwd auth
+class NewExisting,SelectRole,PaymentSuccess,NeedCancel decision
+class AdminDash,UserMgmt,DealerMgmt,CarMgmt,Inventory,Categories,Brands,PaymentMgmt,Finance,Reports,SysSettings,ReviewsMgmt,BookingsMgmt admin
+class DealerDash,SalesDash,CustReq,TestDriveReq,DealerAnalytics,AddCar,EditCar,DeleteCar,InvMgmt dealer
+class HomePage,SearchCars,AdvSearch,TrendingCars,BestDeals,FeaturedCars home
+class AIChat,AIChatbot,CompareAI,VoiceSearch,AICarRec,FamilyRec,FuelRec,EVRec,BudgetRec ai
+class HelpCenter,ContactUs,LiveChat,FAQ,ReportIssue,AskQuestions,DiscussionForum help
+class AboutUs,Terms,OurTeam,Careers,NewsBlogs,PressReleases,PrivacyPolicy about
+class CarCategories,NewCars,UsedCars,ElectricCars,LuxuryCars,UpcomingCars,BrandCollection categories
+class CarDetails,ImageGallery,VideoGallery,View360,Specs,Features,Safety,CompareCars,SimilarCars,AIRecCars,PriceHistory,EMICalc,InsuranceEst,AddWishlist,AddCompare,Cart,BookTestDrive,AskQ2,InquiryStored cardetail
+class Checkout,Payment,PaySuccess,Invoice,RetryPayment checkout
+class SelectDealer,Schedule,BookingConf,BookingHistory,CancelBooking booking
+class Dashboard,MyProfile,EditProfile,SavedCars,Wishlist,ComparedCars,OrderHistory,Notifications,ChatHistory,MyReviews,CustomerReviews,SettingsNode dashboard
+class AIDash,NearbyShowrooms,ServiceCenters,RoadsideAssist,MarketTrends,PricePrediction,PersonalizedRec,ResaleValue,FuelCostPred,LoanEligibility,MaintenanceCost,SuccessStories,VoiceAssistant,Ratings aidash
+
+    </pre>
+  </div>
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, securityLevel: "loose" });
+
+  let scale = 1;
+  const stage = document.getElementById('stage');
+  window.zoom = (factor) => {
+    scale = Math.min(Math.max(scale * factor, 0.2), 3);
+    stage.style.transform = `scale(${scale})`;
+  };
+  window.resetZoom = () => {
+    scale = 1;
+    stage.style.transform = `scale(1)`;
+  };
+
+  const wrap = document.getElementById('canvas-wrap');
+  let isDown = false, startX, startY, scrollLeft, scrollTop;
+  wrap.addEventListener('mousedown', (e) => {
+    isDown = true;
+    startX = e.pageX - wrap.offsetLeft;
+    startY = e.pageY - wrap.offsetTop;
+    scrollLeft = wrap.scrollLeft;
+    scrollTop = wrap.scrollTop;
+    wrap.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mouseup', () => { isDown = false; wrap.style.cursor = 'default'; });
+  wrap.addEventListener('mouseleave', () => { isDown = false; });
+  wrap.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - wrap.offsetLeft;
+    const y = e.pageY - wrap.offsetTop;
+    wrap.scrollLeft = scrollLeft - (x - startX);
+    wrap.scrollTop = scrollTop - (y - startY);
+  });
+</script>
+
+</body>
+</html>
